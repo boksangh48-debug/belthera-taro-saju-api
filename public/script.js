@@ -1,0 +1,1 @@
+(function(){const el=document.getElementById('notice');if(!el)return;const ua=navigator.userAgent||'';const isInApp=/(FBAN|FBAV|Instagram|KAKAOTALK|NAVER|Line|DaumApp|FB_IAB)/i.test(ua);el.textContent=isInApp?'인앱 환경이 감지되었습니다. 오른쪽 위 ••• → 기본 브라우저로 열어주세요.':'브라우저 직행 모드입니다.'})();

@@ -1,0 +1,1 @@
+export const config={runtime:'edge'};export default async function handler(req){const ok=Boolean(process.env.OPENAI_API_KEY&&process.env.GOOGLE_CLIENT_ID&&process.env.GOOGLE_CLIENT_SECRET&&process.env.PUBLIC_BASE_URL);return new Response(JSON.stringify({ok:true,env:ok}),{headers:{'content-type':'application/json'}})}

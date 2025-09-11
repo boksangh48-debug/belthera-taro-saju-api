@@ -1,0 +1,12 @@
+{
+  "name": "Belthera Tarot & Saju API",
+  "baseUrl": "https://<your-domain>.vercel.app",
+  "oauth": {
+    "provider": "google",
+    "scopes": [
+      "openid",
+      "email",
+      "profile"
+    ]
+  }
+}

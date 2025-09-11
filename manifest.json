@@ -1,0 +1,13 @@
+{
+  "name": "Belthera Tarot & Saju",
+  "short_name": "Belthera",
+  "start_url": "/",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "/service/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
