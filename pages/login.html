@@ -1,58 +1,10 @@
-<!doctype html>
-<html lang="ko">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Belthera · Login</title>
-  <meta name="referrer" content="origin-when-cross-origin">
-  <link rel="stylesheet" href="/public/styles.css">
-  <script>
-    function isInApp() {
-      const ua = navigator.userAgent || "";
-      return /(FBAN|FBAV|Instagram|KAKAOTALK|NAVER|Line|DaumApp|FB_IAB)/i.test(ua);
-    }
-    const BASE_URL = (typeof window !== 'undefined') ? window.location.origin : '';
-    window.addEventListener('DOMContentLoaded', () => {
-      const warn = document.getElementById('warn');
-      const box = document.getElementById('gisbox');
-      if (isInApp()) {
-        warn.style.display='block'; box.style.display='none';
-      } else {
-        warn.style.display='none'; box.style.display='block';
-      }
-      document.getElementById('openExternal').addEventListener('click', () => {
-        window.location.href = BASE_URL + "/pages/login.html";
-      });
-    });
-  </script>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-</head>
-<body>
-  <main class="container">
-    <h1>Google 로그인</h1>
-    <div id="warn" class="notice" style="display:none">
-      인앱으로 감지되었습니다. <b>⋯ → 기본 브라우저로 열기</b>를 눌러 주세요.
-      <p><a id="openExternal" class="ghost" href="#">기본 브라우저로 열기</a></p>
-    </div>
-    <div id="gisbox" style="display:none">
-      <div id="g_id_onload"
-           data-client_id="136143721943-jngqlrpvdevr1ikhhi0c5r2sbp9dbqui.apps.googleusercontent.com"
-           data-login_uri="/pages/callback.html"
-           data-ux_mode="redirect"
-           data-context="signin"
-           data-auto_select="false">
-      </div>
-      <div class="g_id_signin"
-           data-type="standard"
-           data-shape="rectangular"
-           data-theme="outline"
-           data-text="signin_with"
-           data-size="large"
-           data-logo_alignment="left">
-      </div>
-      <p class="tag">브라우저에서만 동작합니다. 인앱에서는 게이트 안내를 따르세요.</p>
-    </div>
-    <p><a class="ghost" href="/">메인으로</a></p>
-  </main>
-</body>
-</html>
+<!doctype html><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name='referrer' content='origin-when-cross-origin'><link rel='stylesheet' href='/public/styles.css'>
+<script>function isInApp(){const ua=navigator.userAgent||'';return /(FBAN|FBAV|Instagram|KAKAOTALK|NAVER|Line|DaumApp|FB_IAB)/i.test(ua)}const BASE_URL=typeof window!=='undefined'?window.location.origin:'';window.addEventListener('DOMContentLoaded',()=>{const w=document.getElementById('warn');const b=document.getElementById('gisbox');if(isInApp()){w.style.display='block';b.style.display='none'}else{w.style.display='none';b.style.display='block'}document.getElementById('openExternal').addEventListener('click',()=>{window.location.href=BASE_URL+'/pages/login.html'})});</script>
+<script src='https://accounts.google.com/gsi/client' async defer></script>
+<main class='container'><h1>Google 로그인</h1>
+<div id='warn' class='notice' style='display:none'>인앱으로 감지되었습니다. <b>⋯ → 기본 브라우저로 열기</b>를 눌러 주세요.<p><a id='openExternal' class='ghost' href='#'>기본 브라우저로 열기</a></p></div>
+<div id='gisbox' style='display:none'><div id='g_id_onload' data-client_id='136143721943-jngqlrpvdevr1ikhhi0c5r2sbp9dbqui.apps.googleusercontent.com' data-login_uri='/pages/callback.html' data-ux_mode='redirect' data-context='signin' data-auto_select='false'></div>
+<div class='g_id_signin' data-type='standard' data-shape='rectangular' data-theme='outline' data-text='signin_with' data-size='large' data-logo_alignment='left'></div>
+<p class='tag'>브라우저에서만 동작합니다. 인앱에서는 게이트 안내를 따르세요.</p></div>
+<p><a class='ghost' href='/'>메인으로</a></p></main>

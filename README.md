@@ -1,10 +1,20 @@
-# Belthera Login Autoinject Patch
+# Belthera · Tarot & Saju API — FULL FIXED
+Build: v14 — 2025-09-12 01:10:52 KST
 
-## 포함 파일
-- /pages/login.html → Google Client ID 자동 삽입 버전
-- /pages/callback.html → 로그인 완료 확인 페이지
+## Deploy (Vercel)
+1) GitHub 업로드 → Vercel Import
+2) Project Settings → Build & Output Settings
+   - **Framework Preset = Other**
+   - **Output Directory = .**  (루트)
+3) ENV 4개 입력 → Deploy
+   - OPENAI_API_KEY
+   - GOOGLE_CLIENT_ID
+   - GOOGLE_CLIENT_SECRET
+   - PUBLIC_BASE_URL = https://belthera-taro-saju-api.vercel.app
+   - (선택) REPORT_SIGNATURE
 
-## 적용 방법
-1. 기존 프로젝트에 이 폴더의 파일들을 덮어쓰기
-2. login.html 안의 `data-client_id`는 이미 발급받은 값으로 설정되어 있음
-3. Vercel에서 Redeploy
+확인:
+- /api/env → { ok: true, env: true }
+- / → 루트 index.html 열림
+- /pages/login.html → Google 로그인
+- 인앱에서는 /pages/secure-gate.html 안내
