@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Belthera · 타로·사주</title>
+  <style>
+    :root{--bg:#0f1216;--panel:#12161b;--muted:#9aa3ad;--text:#eef2f6;--accent:#3ddc84;--card:#1a2027;--border:#2a323c}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);
+      font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Helvetica,Arial}
+    .wrap{max-width:720px;margin:24px auto;padding:20px}
+    .hdr{background:linear-gradient(180deg,#141922,#0f1319);border:1px solid var(--border);
+      border-radius:16px;padding:18px 20px;margin-bottom:16px}
+    .hdr h1{margin:0 0 6px;font-size:22px}.sub{margin:0 0 8px;color:var(--muted)}.goal{margin:0;color:#d7e3ff}
+    .btn{display:block;width:100%;text-align:center;padding:16px;border-radius:14px;
+      background:var(--accent);color:#0b0f12;font-weight:600;text-decoration:none;margin:10px 0 12px}
+    .row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .btn2{display:block;text-align:center;padding:12px;border-radius:12px;background:var(--card);
+      border:1px solid var(--border);color:var(--text);text-decoration:none}
+    .ghost{background:transparent;border-style:dashed}
+    .ftr{display:flex;justify-content:space-between;align-items:center;margin-top:18px;
+      color:var(--muted);font-size:12px}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="hdr">
+      <h1>보안 브라우저로 열어드릴게요</h1>
+      <p class="sub">인앱 브라우저에서는 로그인/결제가 제한될 수 있어요. 안전한 브라우저(사파리/크롬)로 열어주세요.</p>
+      <p class="goal">🎯 목적지: <b>Belthera 타로·사주</b></p>
+    </header>
+
+    <a class="btn" href="/pages/login.html">🃏 타로·사주 열기 (사파리/크롬)</a>
+
+    <div class="row">
+      <a class="btn2 ghost" onclick="navigator.clipboard.writeText(location.origin+'/pages/login.html').then(()=>alert('링크 복사됨'))">링크 복사</a>
+      <a class="btn2" href="/pages/login.html" target="_blank" rel="noopener">새 탭으로 열기</a>
+      <a class="btn2" onclick="alert('iOS: ⋯ → Safari로 열기')">iOS 사용법</a>
+    </div>
+
+    <div class="row" style="margin-top:18px">
+      <a class="btn2 ghost" href="https://kmong.com/gig/646792" target="_blank" rel="noopener">🔮 크몽 상담</a>
+      <a class="btn2 ghost" href="https://m.expert.naver.com/expert/profile/home?storeId=100055123" target="_blank" rel="noopener">🌟 네이버 엑스퍼트</a>
+    </div>
+
+    <footer class="ftr"><span>Belthera · Tarot & Saju</span><span>Build: 2025-09-14 09:50:12</span></footer>
+  </main>
+</body>
+</html>

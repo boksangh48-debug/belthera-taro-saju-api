@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Belthera · Login</title>
+  <meta name="referrer" content="origin-when-cross-origin">
+  <style>
+    body{margin:0;background:#0f1216;color:#eef2f6;font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Helvetica,Arial}
+    .wrap{max-width:720px;margin:24px auto;padding:20px}.help{color:#9aa3ad}
+  </style>
+  <script>
+    function isInApp(){const ua=navigator.userAgent||'';return /(FBAN|FBAV|Instagram|KAKAOTALK|NAVER|Line|DaumApp|FB_IAB)/i.test(ua)}
+    window.addEventListener('DOMContentLoaded',()=>{
+      const w=document.getElementById('warn'), b=document.getElementById('gisbox');
+      if(isInApp()){ w.style.display='block'; b.style.display='none'; }
+      else{ w.style.display='none'; b.style.display='block'; }
+    });
+  </script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <main class="wrap">
+    <h1>Google 로그인</h1>
+    <div id="warn" class="help" style="display:none">인앱으로 감지되었습니다. <b>⋯ → 기본 브라우저로 열기</b>를 눌러 주세요.</div>
+    <div id="gisbox" style="display:none">
+      <div id="g_id_onload"
+           data-client_id="136143721943-jngqlrpvdevr1ikhhi0c5r2sbp9dbqui.apps.googleusercontent.com"
+           data-login_uri="/pages/callback.html"
+           data-ux_mode="redirect"
+           data-context="signin"
+           data-auto_select="false"></div>
+      <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline"
+           data-text="signin_with" data-size="large" data-logo_alignment="left"></div>
+      <p class="help">브라우저에서만 동작합니다.</p>
+    </div>
+    <p class="help"><a class="help" href="/">← 메인으로</a></p>
+  </main>
+</body>
+</html>
