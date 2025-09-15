@@ -10,9 +10,7 @@
   <script>
     (function(){
       var PROD = 'https://belthera-taro-saju-api.vercel.app';
-      if (location.origin !== PROD) {
-        location.replace(PROD + '/pages/login.html');
-      }
+      if (location.origin !== PROD) location.replace(PROD + '/pages/login.html');
     })();
   </script>
 
@@ -24,6 +22,7 @@
     .warn{margin:16px 0;padding:12px;border-radius:12px;background:#2a1d1d;border:1px solid #cc4444;color:#ffdddd;text-align:left}
     .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
     .btn{display:inline-block;padding:10px 14px;border-radius:10px;border:1px solid #2a323c;background:#12161b;color:#eef2f6;text-decoration:none}
+    .ios{background:#24324a;border-color:#3a5a9c}
   </style>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -38,7 +37,7 @@
       - iOS 12 이하 : Safari 지원 종료<br>
       <b>정상 이용</b>을 위해서는 Android 10 이상, iOS 13 이상 최신 브라우저(크롬/Safari)에서 접속해 주세요.
       <div style="margin-top:10px">
-        <b>안드로이드 업데이트 방법</b>
+        <b>안드로이드 업데이트</b>
         <ol style="margin:6px 0 0 18px">
           <li>Play 스토어 → <b>Android System WebView</b> → <b>업데이트</b></li>
           <li>Play 스토어 → <b>Google Chrome</b> → <b>업데이트</b></li>
@@ -46,7 +45,10 @@
         </ol>
       </div>
       <div style="margin-top:10px">
-        <b>아이폰(iOS)</b>: 메시지/카톡 인앱이 아닌 <b>Safari</b>로 열기 (공유 버튼 → <b>Safari로 열기</b>)
+        <b>아이폰(iOS)</b>: <u>인앱이 아닌</u> <b>Safari</b>로 열어주세요.
+        <div class="row" style="margin-top:8px">
+          <a class="btn ios" href="javascript:void 0" onclick="alert('iOS 안내\\n1) 우상단 ••• 공유 버튼\\n2) \\\"Safari로 열기\\\" 선택\\n3) Safari에서 로그인 진행')">🍎 Safari로 여는 방법</a>
+        </div>
       </div>
     </div>
 
