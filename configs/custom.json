@@ -1,0 +1,26 @@
+{
+  "brand": {
+    "voice": "따뜻하고 단정한 상담 톤, 직설적이되 공감 유지",
+    "avoid_jargon": true
+  },
+  "report": {
+    "section_count": 11,
+    "sentences_per_section_min": 4,
+    "sentences_per_section_max": 6,
+    "final_summary_focus_default": "감정"   // "감정" | "실행전략"
+  },
+  "tarot": {
+    "deck_mode": "major_only",               // "major_only" | "full_78" (향후 확장)
+    "draw_mode": "deterministic_kst_seed",   // 오늘(KST)+입력값으로 결정론 뽑기
+    "use_reversed": false
+  },
+  "saju": {
+    "require_time_rhythm_when_unknown": true,
+    "time_rhythm_options": ["오전형","낮형","저녁형"]
+  },
+  "followup": {
+    "limit_per_report": 5,                   // 추가 질문 5회
+    "sentences_min": 5,
+    "sentences_max": 7
+  }
+}
