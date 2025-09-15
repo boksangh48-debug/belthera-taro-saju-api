@@ -28,11 +28,10 @@
     .notice{margin:-6px 0 12px;padding:10px 12px;border-radius:12px;background:#113d2b;border:1px solid #215c40;color:#d6ffe8;display:none}
     .btn{display:block;width:100%;text-align:center;padding:16px;border-radius:14px;background:var(--accent);color:#0b0f12;font-weight:700;text-decoration:none;margin:10px 0 12px}
     .row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-    .btn2{display:block;text-align:center;padding:12px;border-radius:12px;background:var(--card);border:1px solid var(--border);color:var(--text);text-decoration:none}
+    .btn2{display:block;text-align:center;padding:12px;border-radius:12px;background:#1a2027;border:1px solid #2a323c;color:#eef2f6;text-decoration:none}
     .ghost{background:transparent;border-style:dashed}
-    .ftr{display:flex;justify-content:space-between;align-items:center;margin-top:18px;color:var(--muted);font-size:12px}
+    .ftr{display:flex;justify-content:space-between;align-items:center;margin-top:18px;color:#9aa3ad;font-size:12px}
     .help{color:#9aa3ad}
-
     /* 인앱 안내 카드 */
     .iab{display:none;margin:0 0 12px;padding:12px;border-radius:12px;background:#1a2027;border:1px solid #2a323c}
     .iab .row{grid-template-columns:repeat(2,1fr)}
@@ -63,7 +62,7 @@
 
     <!-- 일반 브라우저에서 보이는 CTA -->
     <section id="ctaWrap">
-      <!-- ✅ 절대경로로 고정: 항상 프로덕션 로그인으로 -->
+      <!-- ✅ 절대경로로 고정 -->
       <a id="cta" class="btn" href="https://belthera-taro-saju-api.vercel.app/pages/login.html">
         🃏 타로·사주 열기 (사파리/크롬)
       </a>
@@ -75,27 +74,26 @@
       <a class="btn2" href="javascript:void 0" id="iosHelp">iOS 사용법</a>
     </section>
 
+    <!-- 🔗 상담/전자책/블로그/인스타 링크 -->
     <div class="row" style="margin-top:18px">
       <a class="btn2 ghost" href="https://kmong.com/gig/646792" target="_blank" rel="noopener">🔮 크몽 상담</a>
       <a class="btn2 ghost" href="https://m.expert.naver.com/expert/profile/home?storeId=100055123" target="_blank" rel="noopener">🌟 네이버 엑스퍼트</a>
+      <a class="btn2 ghost" href="https://kmong.com/self-marketing/682413/lYizOhZdqj" target="_blank" rel="noopener">📚 벨테라 타로 원장 전자책</a>
+      <a class="btn2 ghost" href="https://blog.naver.com/vellthera_tarot" target="_blank" rel="noopener">📝 네이버 블로그</a>
+      <a class="btn2 ghost" href="https://www.instagram.com/velthera_tarot/?igsh=enB0M3BobjJ6NzV2#" target="_blank" rel="noopener">📷 인스타그램</a>
     </div>
 
     <footer class="ftr"><span>Belthera · Tarot & Saju</span><span>Build: now</span></footer>
   </main>
 
   <script>
-    // 쿼리/쿠키 유틸
     function qs(n){return new URL(location.href).searchParams.get(n)}
     function hasCookie(n){return document.cookie.split(';').some(c=>c.trim().startsWith(n+'='))}
     function setCookie(n,v,max){document.cookie=`${n}=${v}; Path=/; Max-Age=${max}; SameSite=Lax; Secure`}
-
-    // 인앱 감지(강화)
     function isInApp(){
       const ua=(navigator.userAgent||'').toLowerCase();
       return /(kakaotalk|instagram|fbav|fban|fb_iab|line|naver|daumapp|; wv| version\/\d+\.\d+ chrome\/\d+\.\d+ mobile safari\/\d+)/i.test(ua);
     }
-
-    // Android 인텐트로 외부 브라우저 강제 이동
     function openWith(pkg){
       const url='https://belthera-taro-saju-api.vercel.app/pages/login.html';
       location.href='intent://'+url.replace(/^https?:\/\//,'')+'#Intent;scheme=https;package='+pkg+';end';
@@ -105,29 +103,24 @@
       (navigator.clipboard?.writeText(url)||Promise.reject()).then(()=>alert('링크 복사됨')).catch(()=>alert('복사 실패'));
     }
 
-    // 초기 상태(로그인 배지, 인앱 안내)
     (function(){
       if(qs('signed_in')==='1' || hasCookie('g_signed')){
         setCookie('g_signed','1',600);
         const sn=document.getElementById('signedNotice');
         sn.style.display='block';
         setTimeout(()=>{ sn.style.display='none'; }, 2500);
-        // 주소에서 표식 제거
         if(location.search.includes('signed_in=1')){
           const u=new URL(location.href); u.searchParams.delete('signed_in');
           history.replaceState({},'',u.pathname+(u.search?('?'+u.searchParams.toString()):''));
         }
       }
-
       const iab=isInApp();
       document.getElementById('iab').style.display = iab ? 'block' : 'none';
       document.getElementById('ctaWrap').style.display = iab ? 'none'  : 'block';
       document.getElementById('ctaRow').style.display  = iab ? 'none'  : 'grid';
-
-      // 버튼 바인딩
       document.getElementById('copyLoginLink').onclick = copyLoginLink;
       document.getElementById('copyLoginLink2').onclick= copyLoginLink;
-      document.getElementById('iosHelp').onclick      = ()=>alert('iOS: 우상단 ••• 공유 → Safari로 열기');
+      document.getElementById('iosHelp').onclick      = ()=>alert('iOS: ••• 공유 → Safari로 열기');
       document.getElementById('openChrome').onclick   = ()=>openWith('com.android.chrome');
       document.getElementById('openSamsung').onclick  = ()=>openWith('com.sec.android.app.sbrowser');
     })();
