@@ -18,7 +18,6 @@
 
   <style>
     :root{--bg:#0f1216;--panel:#12161b;--muted:#9aa3ad;--text:#eef2f6;--accent:#3ddc84;--card:#1a2027;--border:#2a323c}
-    *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Helvetica,Arial}
     .wrap{max-width:720px;margin:24px auto;padding:20px}
     .hdr{background:linear-gradient(180deg,#141922,#0f1319);border:1px solid var(--border);border-radius:16px;padding:18px 20px;margin-bottom:16px}
@@ -28,13 +27,12 @@
     .notice{margin:-6px 0 12px;padding:10px 12px;border-radius:12px;background:#113d2b;border:1px solid #215c40;color:#d6ffe8;display:none}
     .btn{display:block;width:100%;text-align:center;padding:16px;border-radius:14px;background:var(--accent);color:#0b0f12;font-weight:700;text-decoration:none;margin:10px 0 12px}
     .row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-    .btn2{display:block;text-align:center;padding:12px;border-radius:12px;background:#1a2027;border:1px solid #2a323c;color:#eef2f6;text-decoration:none}
-    .ghost{background:transparent;border-style:dashed}
+    .btn2{display:block;text-align:center;padding:12px;border-radius:12px;background:#1a2027;border:1px solid var(--border);color:#eef2f6;text-decoration:none}
     .ftr{display:flex;justify-content:space-between;align-items:center;margin-top:18px;color:#9aa3ad;font-size:12px}
-    .help{color:#9aa3ad}
-    /* 인앱 안내 카드 */
-    .iab{display:none;margin:0 0 12px;padding:12px;border-radius:12px;background:#1a2027;border:1px solid #2a323c}
-    .iab .row{grid-template-columns:repeat(2,1fr)}
+    .warn{margin:16px 0;padding:12px;border-radius:12px;background:#2a1d1d;border:1px solid #cc4444;color:#ffdddd}
+    .help{margin:16px 0;padding:12px;border-radius:12px;background:#12161b;border:1px solid #2a323c;color:#dbe2ea}
+    .help h3{margin:0 0 8px;font-size:16px}
+    .help ol{margin:6px 0 0 18px}
   </style>
 </head>
 <body>
@@ -46,41 +44,41 @@
       <div id="signedNotice" class="notice">✅ 로그인 완료 — 안전 브라우저로 돌아왔습니다.</div>
     </header>
 
-    <!-- 인앱 전용 안내 + 외부 브라우저 버튼 -->
-    <section id="iab" class="iab">
-      <p class="help" style="margin:0 0 8px">인앱으로 감지되었습니다. 아래 버튼으로 <b>외부 브라우저</b>에서 열어주세요.</p>
-      <div class="row">
-        <a class="btn2" id="openChrome">🔓 크롬으로 열기 (Android)</a>
-        <a class="btn2" id="openSamsung">🔓 삼성 인터넷으로 열기 (Android)</a>
-      </div>
-      <div class="row" style="margin-top:8px">
-        <a class="btn2 ghost" id="copyLoginLink">🔗 로그인 링크 복사</a>
-        <a class="btn2 ghost" href="https://belthera-taro-saju-api.vercel.app/pages/login.html" target="_blank" rel="noopener">새 탭으로 열기</a>
-      </div>
-      <p class="help" style="margin-top:8px">iOS: 우상단 <b>공유</b> → <b>Safari로 열기</b></p>
-    </section>
+    <!-- ⚠️ 구형 기기 안내 -->
+    <div class="warn">
+      ⚠️ 안내: 구형 기기에서는 서비스가 지원되지 않을 수 있습니다.<br>
+      - Android 9 (Pie) 이하 : 대화창 미표시/로그인 오류 가능<br>
+      - iOS 12 이하 : Safari 지원 종료<br>
+      <b>정상 이용을 위해서는 Android 10 이상, iOS 13 이상 최신 브라우저(크롬/Safari)</b>에서 접속해 주세요.
+    </div>
 
-    <!-- 일반 브라우저에서 보이는 CTA -->
-    <section id="ctaWrap">
-      <!-- ✅ 절대경로로 고정 -->
-      <a id="cta" class="btn" href="https://belthera-taro-saju-api.vercel.app/pages/login.html">
-        🃏 타로·사주 열기 (사파리/크롬)
-      </a>
-    </section>
+    <!-- 📘 업데이트/외부브라우저 안내 -->
+    <div class="help">
+      <h3>안드로이드(WebView/크롬) 업데이트 방법</h3>
+      <ol>
+        <li>Play 스토어 열기 → <b>Android System WebView</b> 검색 → <b>업데이트</b></li>
+        <li>Play 스토어 → <b>Google Chrome</b> → <b>업데이트</b></li>
+        <li>폰 재시작 후 다시 접속</li>
+      </ol>
+      <h3 style="margin-top:10px">iPhone(iOS) 안내</h3>
+      <ol>
+        <li>메시지/카톡 인앱이 아닌 <b>Safari</b>로 열기 (공유 버튼 → <b>Safari로 열기</b>)</li>
+        <li>설정 → 일반 → 소프트웨어 업데이트에서 최신 iOS 권장</li>
+      </ol>
+    </div>
 
-    <section id="ctaRow" class="row">
-      <a class="btn2 ghost" id="copyLoginLink2">링크 복사</a>
-      <a class="btn2" href="https://belthera-taro-saju-api.vercel.app/pages/login.html" target="_blank" rel="noopener">새 탭으로 열기</a>
-      <a class="btn2" href="javascript:void 0" id="iosHelp">iOS 사용법</a>
-    </section>
+    <!-- CTA 버튼 -->
+    <a id="cta" class="btn" href="https://belthera-taro-saju-api.vercel.app/pages/login.html">
+      🃏 타로·사주 열기 (사파리/크롬)
+    </a>
 
-    <!-- 🔗 상담/전자책/블로그/인스타 링크 -->
+    <!-- 링크 모음 -->
     <div class="row" style="margin-top:18px">
-      <a class="btn2 ghost" href="https://kmong.com/gig/646792" target="_blank" rel="noopener">🔮 크몽 상담</a>
-      <a class="btn2 ghost" href="https://m.expert.naver.com/expert/profile/home?storeId=100055123" target="_blank" rel="noopener">🌟 네이버 엑스퍼트</a>
-      <a class="btn2 ghost" href="https://kmong.com/self-marketing/682413/lYizOhZdqj" target="_blank" rel="noopener">📚 벨테라 타로 원장 전자책</a>
-      <a class="btn2 ghost" href="https://blog.naver.com/vellthera_tarot" target="_blank" rel="noopener">📝 네이버 블로그</a>
-      <a class="btn2 ghost" href="https://www.instagram.com/velthera_tarot/?igsh=enB0M3BobjJ6NzV2#" target="_blank" rel="noopener">📷 인스타그램</a>
+      <a class="btn2" href="https://kmong.com/gig/646792" target="_blank">🔮 크몽 상담</a>
+      <a class="btn2" href="https://m.expert.naver.com/expert/profile/home?storeId=100055123" target="_blank">🌟 네이버 엑스퍼트</a>
+      <a class="btn2" href="https://kmong.com/self-marketing/682413/lYizOhZdqj" target="_blank">📚 전자책</a>
+      <a class="btn2" href="https://blog.naver.com/vellthera_tarot" target="_blank">📝 블로그</a>
+      <a class="btn2" href="https://www.instagram.com/velthera_tarot" target="_blank">📷 인스타그램</a>
     </div>
 
     <footer class="ftr"><span>Belthera · Tarot & Saju</span><span>Build: now</span></footer>
@@ -90,19 +88,6 @@
     function qs(n){return new URL(location.href).searchParams.get(n)}
     function hasCookie(n){return document.cookie.split(';').some(c=>c.trim().startsWith(n+'='))}
     function setCookie(n,v,max){document.cookie=`${n}=${v}; Path=/; Max-Age=${max}; SameSite=Lax; Secure`}
-    function isInApp(){
-      const ua=(navigator.userAgent||'').toLowerCase();
-      return /(kakaotalk|instagram|fbav|fban|fb_iab|line|naver|daumapp|; wv| version\/\d+\.\d+ chrome\/\d+\.\d+ mobile safari\/\d+)/i.test(ua);
-    }
-    function openWith(pkg){
-      const url='https://belthera-taro-saju-api.vercel.app/pages/login.html';
-      location.href='intent://'+url.replace(/^https?:\/\//,'')+'#Intent;scheme=https;package='+pkg+';end';
-    }
-    function copyLoginLink(){
-      const url='https://belthera-taro-saju-api.vercel.app/pages/login.html';
-      (navigator.clipboard?.writeText(url)||Promise.reject()).then(()=>alert('링크 복사됨')).catch(()=>alert('복사 실패'));
-    }
-
     (function(){
       if(qs('signed_in')==='1' || hasCookie('g_signed')){
         setCookie('g_signed','1',600);
@@ -114,15 +99,6 @@
           history.replaceState({},'',u.pathname+(u.search?('?'+u.searchParams.toString()):''));
         }
       }
-      const iab=isInApp();
-      document.getElementById('iab').style.display = iab ? 'block' : 'none';
-      document.getElementById('ctaWrap').style.display = iab ? 'none'  : 'block';
-      document.getElementById('ctaRow').style.display  = iab ? 'none'  : 'grid';
-      document.getElementById('copyLoginLink').onclick = copyLoginLink;
-      document.getElementById('copyLoginLink2').onclick= copyLoginLink;
-      document.getElementById('iosHelp').onclick      = ()=>alert('iOS: ••• 공유 → Safari로 열기');
-      document.getElementById('openChrome').onclick   = ()=>openWith('com.android.chrome');
-      document.getElementById('openSamsung').onclick  = ()=>openWith('com.sec.android.app.sbrowser');
     })();
   </script>
 </body>
