@@ -5,21 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Belthera · 타로·사주 리포트</title>
   <style>
-    body{margin:0;background:#0f1216;color:#eef2f6;font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Helvetica,Arial}
+    body{margin:0;background:#0f1216;color:#eef2f6;
+      font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Helvetica,Arial}
     .wrap{max-width:980px;margin:24px auto;padding:16px}
     .card{background:#12161b;border:1px solid #2a323c;border-radius:14px;padding:16px;margin-bottom:16px}
     label{display:block;margin:8px 0 4px;color:#9aa3ad}
-    input,select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #2a323c;background:#0f1216;color:#eef2f6}
-    button{padding:10px 14px;border-radius:10px;border:0;background:#3ddc84;color:#0b0f12;font-weight:700;cursor:pointer}
+    input,select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid #2a323c;
+      background:#0f1216;color:#eef2f6}
+    button{padding:10px 14px;border-radius:10px;border:0;background:#3ddc84;color:#0b0f12;
+      font-weight:700;cursor:pointer}
     pre{white-space:pre-wrap;word-break:break-word}
     .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
     .sec{border:1px solid #2a323c;border-radius:12px;padding:12px;margin:10px 0}
     .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
     .muted{color:#9aa3ad}
-    .badge{display:inline-block;padding:6px 10px;border-radius:999px;background:#1a2027;border:1px solid #2a323c;color:#d7e3ff;margin-left:8px}
+    .badge{display:inline-block;padding:6px 10px;border-radius:999px;background:#1a2027;
+      border:1px solid #2a323c;color:#d7e3ff;margin-left:8px}
     .warn{color:#f6d6d6}
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center}
-    .sheet{background:#12161b;border:1px solid #2a323c;border-radius:14px;padding:16px;max-width:420px;width:92%}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;
+      align-items:center;justify-content:center}
+    .sheet{background:#12161b;border:1px solid #2a323c;border-radius:14px;padding:16px;
+      max-width:420px;width:92%}
   </style>
 </head>
 <body>
@@ -31,25 +37,39 @@
     <section class="card">
       <div class="grid">
         <div><label>이름</label><input id="name" placeholder="예) 홍길동"></div>
-        <div><label>성별</label><select id="gender"><option>미상</option><option>남성</option><option>여성</option></select></div>
+        <div><label>성별</label>
+          <select id="gender"><option>미상</option><option>남성</option><option>여성</option></select>
+        </div>
         <div><label>생년월일</label><input id="birth_date" placeholder="예) 1991-03-20"></div>
-        <div><label>달력</label><select id="calendar"><option>양력</option><option>음력</option></select></div>
+        <div><label>달력</label>
+          <select id="calendar"><option>양력</option><option>음력</option></select>
+        </div>
         <div><label>태어난 시간</label><input id="time" placeholder="예) 오전 7:47 또는 모름"></div>
         <div><label>태어난 도시</label><input id="city" placeholder="예) 천안"></div>
       </div>
       <label>질문/의도</label>
       <textarea id="question" rows="3" placeholder="예) 연애/직업/재물 관련해서 올해 흐름이 궁금합니다."></textarea>
 
-      <!-- 출생시간 리듬 보정 (time 모름일 때 선택) -->
+      <!-- 출생시간 리듬 보정 -->
       <div class="row" style="margin-top:8px">
         <label style="margin:0">출생시간 리듬</label>
         <select id="time_rhythm_selected">
-          <option value="">(모름일 때만 선택) — 선택 안 하면 요청됨</option>
+          <option value="">(모름일 때만 선택)</option>
           <option>오전형</option>
           <option>낮형</option>
           <option>저녁형</option>
         </select>
-        <span class="muted">모름이면 오전형/낮형/저녁형 중 선택</span>
+        <span class="muted">모름이면 3가지 중 선택</span>
+      </div>
+
+      <!-- 마무리 초점 선택 -->
+      <div class="row" style="margin-top:8px">
+        <label style="margin:0">마무리 초점</label>
+        <select id="final_summary_focus">
+          <option>감정</option>
+          <option>실행전략</option>
+        </select>
+        <span class="muted">11번 섹션 문체 반영</span>
       </div>
 
       <div class="row" style="margin-top:12px">
@@ -97,7 +117,8 @@
       gender: document.getElementById('gender').value || '미상',
       city: document.getElementById('city').value || '',
       question: document.getElementById('question').value || '',
-      time_rhythm_selected: document.getElementById('time_rhythm_selected').value || ''
+      time_rhythm_selected: document.getElementById('time_rhythm_selected').value || '',
+      final_summary_focus: document.getElementById('final_summary_focus').value || '감정'
     });
 
     // 리포트 생성
@@ -109,7 +130,7 @@
         let r = await fetch('/api/reading', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
         let j = await r.json();
 
-        // 리듬 필요 시 모달로 선택 → 재요청
+        // 리듬 필요 시 모달
         if(j.need_time_rhythm){
           const modal=document.getElementById('rhythmModal'); modal.style.display='flex';
           document.querySelectorAll('.pick').forEach(btn=>{
@@ -145,7 +166,8 @@
           </div>
           <p style="margin:8px 0 10px">${s.body}</p>
           <div class="row">
-            <input id="q_${idx}" placeholder="이 섹션에 대한 추가 질문(선택)" style="flex:1;min-width:200px;padding:8px;border-radius:10px;border:1px solid #2a323c;background:#0f1216;color:#eef2f6">
+            <input id="q_${idx}" placeholder="이 섹션에 대한 추가 질문(선택)" 
+              style="flex:1;min-width:200px;padding:8px;border-radius:10px;border:1px solid #2a323c;background:#0f1216;color:#eef2f6">
             <button data-idx="${idx}" data-title="${s.title}" class="follow">자세히</button>
           </div>
           <div id="a_${idx}" class="muted" style="margin-top:8px"></div>
