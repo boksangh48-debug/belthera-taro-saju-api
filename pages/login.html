@@ -6,7 +6,7 @@
   <title>Google 로그인</title>
   <meta name="referrer" content="origin-when-cross-origin">
 
-  <!-- ✅ 프리뷰에서 열리면 프로덕션으로 강제 이동 -->
+  <!-- 프리뷰에서 열리면 프로덕션으로 강제 이동 -->
   <script>
     (function(){
       var PROD = 'https://belthera-taro-saju-api.vercel.app';
@@ -15,44 +15,24 @@
   </script>
 
   <style>
-    body{margin:0;background:#0f1216;color:#eef2f6;font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Helvetica,Arial}
-    .wrap{max-width:640px;margin:40px auto;padding:20px;text-align:center}
-    h1{margin-bottom:20px}
+    body{margin:0;background:#0f1216;color:#eef2f6;
+      font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Helvetica,Arial}
+    .wrap{max-width:640px;margin:60px auto;padding:20px;text-align:center}
+    h1{margin-bottom:22px}
     .help{color:#9aa3ad;margin-top:12px}
-    .warn{margin:16px 0;padding:14px;border-radius:12px;background:#2a1d1d;border:1px solid #cc4444;color:#ffdddd;text-align:left}
-    .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px}
-    .btn{display:inline-block;padding:10px 14px;border-radius:10px;border:1px solid #2a323c;background:#12161b;color:#eef2f6;text-decoration:none}
-    .ios{background:#24324a;border-color:#3a5a9c}
+    .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+    .btn{display:inline-block;padding:10px 14px;border-radius:10px;border:1px solid #2a323c;
+      background:#12161b;color:#eef2f6;text-decoration:none}
   </style>
+
+  <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <main class="wrap">
     <h1>Google 로그인</h1>
 
-    <!-- ⚠️ 구형 기기 안내 + 업데이트 가이드 -->
-    <div class="warn">
-      <b>⚠️ 구형 기기 안내</b><br>
-      - Android 9 (Pie) 이하 : 대화창 미표시/로그인 오류 가능<br>
-      - iOS 12 이하 : Safari 지원 종료<br>
-      <b>정상 이용</b>을 위해서는 Android 10 이상, iOS 13 이상 최신 브라우저(크롬/Safari)에서 접속해 주세요.
-      <div style="margin-top:10px">
-        <b>안드로이드 업데이트</b>
-        <ol style="margin:6px 0 0 18px">
-          <li>Play 스토어 → <b>Android System WebView</b> → <b>업데이트</b></li>
-          <li>Play 스토어 → <b>Google Chrome</b> → <b>업데이트</b></li>
-          <li>폰 재시작 후 다시 시도</li>
-        </ol>
-      </div>
-      <div style="margin-top:10px">
-        <b>아이폰(iOS)</b>: <u>인앱이 아닌</u> <b>Safari</b>로 열어주세요.
-        <div class="row" style="margin-top:8px">
-          <a class="btn ios" href="javascript:void(0)" onclick="alert('iOS 안내\\n1) 우상단 ••• 공유 버튼\\n2) \\\"Safari로 열기\\\" 선택\\n3) Safari에서 로그인 진행')">🍎 Safari로 여는 방법</a>
-        </div>
-      </div>
-    </div>
-
-    <!-- ✅ Google 로그인 버튼 (항상 프로덕션 콜백으로 연결) -->
+    <!-- ✅ 구글 버튼(필수) — 콜백은 프로덕션 절대경로 고정 -->
     <div id="g_id_onload"
          data-client_id="450986282498-qrps05rotaju8g808co7aank22mkag02.apps.googleusercontent.com"
          data-login_uri="https://belthera-taro-saju-api.vercel.app/api/google-callback"
@@ -63,7 +43,7 @@
     <div class="g_id_signin"
          data-type="standard" data-shape="rectangular" data-theme="outline"
          data-text="signin_with" data-size="large" data-logo_alignment="left"
-         style="margin-top:20px"></div>
+         style="margin-top:18px"></div>
 
     <p class="help">브라우저(Safari/크롬)에서만 동작합니다.</p>
 
