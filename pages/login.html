@@ -17,79 +17,52 @@
   </script>
 
   <style>
-    body{margin:0;background:#0f1216;color:#eef2f6;
-      font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Helvetica,Arial}
+    body{margin:0;background:#0f1216;color:#eef2f6;font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Helvetica,Arial}
     .wrap{max-width:640px;margin:60px auto;padding:20px;text-align:center}
     h1{margin-bottom:20px}
     .help{color:#9aa3ad;margin-top:12px}
+    .warn{margin:16px 0;padding:12px;border-radius:12px;background:#2a1d1d;border:1px solid #cc4444;color:#ffdddd;text-align:left}
     .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
-    .btn{display:inline-block;padding:10px 14px;border-radius:10px;border:1px solid #2a323c;
-      background:#12161b;color:#eef2f6;text-decoration:none}
-    .primary{background:#3ddc84;color:#0b0f12;border-color:#2aa96a;font-weight:700}
-    .hidden{display:none}
+    .btn{display:inline-block;padding:10px 14px;border-radius:10px;border:1px solid #2a323c;background:#12161b;color:#eef2f6;text-decoration:none}
   </style>
-
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <main class="wrap">
     <h1>Google 로그인</h1>
 
-    <!-- 인앱 차단 + 외부 브라우저 유도 -->
-    <div id="iab" class="hidden">
-      <p class="help">인앱(내장 브라우저)으로 감지되었습니다. 보안을 위해 Google 로그인이 차단됩니다.</p>
-      <div class="row" style="margin-top:8px">
-        <a class="btn" id="openChrome">🔓 크롬으로 열기 (Android)</a>
-        <a class="btn" id="openSamsung">🔓 삼성 인터넷으로 열기 (Android)</a>
-        <a class="btn" id="copyLink">🔗 로그인 링크 복사</a>
+    <!-- ⚠️ 구형 기기 안내 + 업데이트 가이드 -->
+    <div class="warn">
+      <b>⚠️ 구형 기기 안내</b><br>
+      - Android 9 (Pie) 이하 : 대화창 미표시/로그인 오류 가능<br>
+      - iOS 12 이하 : Safari 지원 종료<br>
+      <b>정상 이용</b>을 위해서는 Android 10 이상, iOS 13 이상 최신 브라우저(크롬/Safari)에서 접속해 주세요.
+      <div style="margin-top:10px">
+        <b>안드로이드 업데이트 방법</b>
+        <ol style="margin:6px 0 0 18px">
+          <li>Play 스토어 → <b>Android System WebView</b> → <b>업데이트</b></li>
+          <li>Play 스토어 → <b>Google Chrome</b> → <b>업데이트</b></li>
+          <li>폰 재시작 후 다시 시도</li>
+        </ol>
       </div>
-      <p class="help" style="margin-top:8px">iOS: 우측 상단 <b>공유</b> → <b>Safari로 열기</b>를 선택해 주세요.</p>
-      <div class="row" style="margin-top:16px">
-        <a href="/" class="btn">← 메인으로</a>
+      <div style="margin-top:10px">
+        <b>아이폰(iOS)</b>: 메시지/카톡 인앱이 아닌 <b>Safari</b>로 열기 (공유 버튼 → <b>Safari로 열기</b>)
       </div>
     </div>
 
-    <!-- 일반 브라우저에서만 Google 버튼 노출 -->
-    <div id="gis" class="hidden">
-      <div id="g_id_onload"
-           data-client_id="450986282498-qrps05rotaju8g808co7aank22mkag02.apps.googleusercontent.com"
-           data-login_uri="https://belthera-taro-saju-api.vercel.app/api/google-callback"
-           data-ux_mode="redirect"
-           data-context="signin"
-           data-auto_select="false"></div>
-      <div class="g_id_signin"
-           data-type="standard" data-shape="rectangular" data-theme="outline"
-           data-text="signin_with" data-size="large" data-logo_alignment="left"></div>
-      <p class="help">브라우저에서만 동작합니다.</p>
-      <div class="row"><a href="/" class="btn">← 메인으로</a></div>
-    </div>
+    <!-- Google 로그인 버튼 (항상 프로덕션 콜백으로) -->
+    <div id="g_id_onload"
+         data-client_id="450986282498-qrps05rotaju8g808co7aank22mkag02.apps.googleusercontent.com"
+         data-login_uri="https://belthera-taro-saju-api.vercel.app/api/google-callback"
+         data-ux_mode="redirect"
+         data-context="signin"
+         data-auto_select="false"></div>
+    <div class="g_id_signin"
+         data-type="standard" data-shape="rectangular" data-theme="outline"
+         data-text="signin_with" data-size="large" data-logo_alignment="left"></div>
+
+    <p class="help">브라우저(Safari/크롬)에서만 동작합니다.</p>
+    <div class="row"><a href="/" class="btn">← 메인으로</a></div>
   </main>
-
-  <script>
-    function isInApp(){
-      const ua=(navigator.userAgent||'').toLowerCase();
-      const tokens=/(kakaotalk|instagram|fbav|fban|fb_iab|line|naver|daumapp|; wv| version\/\d+\.\d+ chrome\/\d+\.\d+ mobile safari\/\d+)/i;
-      return tokens.test(ua);
-    }
-    function openWith(pkg){
-      const url='https://belthera-taro-saju-api.vercel.app/pages/login.html';
-      location.href='intent://'+url.replace(/^https?:\/\//,'')+'#Intent;scheme=https;package='+pkg+';end';
-    }
-    function copyLoginLink(){
-      const url='https://belthera-taro-saju-api.vercel.app/pages/login.html';
-      (navigator.clipboard?.writeText(url)||Promise.reject()).then(()=>alert('링크 복사됨')).catch(()=>alert('복사 실패'));
-    }
-
-    window.addEventListener('DOMContentLoaded',()=>{
-      const iab=isInApp();
-      document.getElementById('iab').classList.toggle('hidden',!iab);
-      document.getElementById('gis').classList.toggle('hidden',iab);
-      if(iab){
-        document.getElementById('openChrome').onclick = ()=>openWith('com.android.chrome');
-        document.getElementById('openSamsung').onclick= ()=>openWith('com.sec.android.app.sbrowser');
-        document.getElementById('copyLink').onclick   = copyLoginLink;
-      }
-    });
-  </script>
 </body>
 </html>
