@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Google 로그인</title>
   <meta name="referrer" content="origin-when-cross-origin">
+
+  <!-- ✅ 프리뷰에서 열리면 프로덕션으로 강제 이동 -->
+  <script>
+    (function(){
+      var PROD = 'https://belthera-taro-saju-api.vercel.app';
+      if (location.origin !== PROD) {
+        location.replace(PROD + '/pages/login.html');
+      }
+    })();
+  </script>
+
   <style>
     body{margin:0;background:#0f1216;color:#eef2f6;
       font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Helvetica,Arial}
@@ -17,6 +28,7 @@
     .primary{background:#3ddc84;color:#0b0f12;border-color:#2aa96a;font-weight:700}
     .hidden{display:none}
   </style>
+
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
@@ -27,7 +39,6 @@
     <div id="iab" class="hidden">
       <p class="help">인앱(내장 브라우저)으로 감지되었습니다. 보안을 위해 Google 로그인이 차단됩니다.</p>
       <div class="row" style="margin-top:8px">
-        <!-- Android 강제 이동(크롬/삼성 인터넷) -->
         <a class="btn" id="openChrome">🔓 크롬으로 열기 (Android)</a>
         <a class="btn" id="openSamsung">🔓 삼성 인터넷으로 열기 (Android)</a>
         <a class="btn" id="copyLink">🔗 로그인 링크 복사</a>
@@ -55,35 +66,28 @@
   </main>
 
   <script>
-    // 더 강한 인앱(WebView) 감지
     function isInApp(){
-      const ua = (navigator.userAgent||'').toLowerCase();
-      // 주요 인앱 UA + 안드로이드 WebView 토큰(; wv)
-      const tokens = /(kakaotalk|instagram|fbav|fban|fb_iab|line|naver|daumapp|; wv| version\/\d+\.\d+ chrome\/\d+\.\d+ mobile safari\/\d+)/i;
+      const ua=(navigator.userAgent||'').toLowerCase();
+      const tokens=/(kakaotalk|instagram|fbav|fban|fb_iab|line|naver|daumapp|; wv| version\/\d+\.\d+ chrome\/\d+\.\d+ mobile safari\/\d+)/i;
       return tokens.test(ua);
     }
-    function isAndroid(){ return /android/i.test(navigator.userAgent||''); }
-
-    // Android 인텐트: 외부 브라우저로 강제 이동
     function openWith(pkg){
-      const url = location.origin + '/pages/login.html';
-      location.href = 'intent://' + url.replace(/^https?:\/\//,'') + '#Intent;scheme=https;package=' + pkg + ';end';
+      const url='https://belthera-taro-saju-api.vercel.app/pages/login.html';
+      location.href='intent://'+url.replace(/^https?:\/\//,'')+'#Intent;scheme=https;package='+pkg+';end';
     }
     function copyLoginLink(){
-      const url = location.origin + '/pages/login.html';
-      (navigator.clipboard?.writeText(url) || Promise.reject()).then(()=>alert('링크 복사됨')).catch(()=>alert('복사 실패'));
+      const url='https://belthera-taro-saju-api.vercel.app/pages/login.html';
+      (navigator.clipboard?.writeText(url)||Promise.reject()).then(()=>alert('링크 복사됨')).catch(()=>alert('복사 실패'));
     }
 
-    window.addEventListener('DOMContentLoaded', ()=>{
-      const iab = isInApp();
-      document.getElementById('iab').classList.toggle('hidden', !iab);
-      document.getElementById('gis').classList.toggle('hidden', iab);
-
-      // 인앱이면 유도 버튼 준비
-      if (iab) {
-        document.getElementById('openChrome').onclick  = ()=> openWith('com.android.chrome');
-        document.getElementById('openSamsung').onclick = ()=> openWith('com.sec.android.app.sbrowser');
-        document.getElementById('copyLink').onclick    = copyLoginLink;
+    window.addEventListener('DOMContentLoaded',()=>{
+      const iab=isInApp();
+      document.getElementById('iab').classList.toggle('hidden',!iab);
+      document.getElementById('gis').classList.toggle('hidden',iab);
+      if(iab){
+        document.getElementById('openChrome').onclick = ()=>openWith('com.android.chrome');
+        document.getElementById('openSamsung').onclick= ()=>openWith('com.sec.android.app.sbrowser');
+        document.getElementById('copyLink').onclick   = copyLoginLink;
       }
     });
   </script>
