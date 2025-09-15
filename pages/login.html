@@ -6,7 +6,7 @@
   <title>Google 로그인</title>
   <meta name="referrer" content="origin-when-cross-origin">
 
-  <!-- 프리뷰에서 열리면 프로덕션으로 강제 이동 -->
+  <!-- ✅ 프리뷰에서 열리면 프로덕션으로 강제 이동 -->
   <script>
     (function(){
       var PROD = 'https://belthera-taro-saju-api.vercel.app';
@@ -17,12 +17,15 @@
   <style>
     body{margin:0;background:#0f1216;color:#eef2f6;
       font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Helvetica,Arial}
-    .wrap{max-width:640px;margin:60px auto;padding:20px;text-align:center}
-    h1{margin-bottom:22px}
+    .wrap{max-width:640px;margin:56px auto;padding:20px;text-align:center}
+    h1{margin:0 0 18px}
     .help{color:#9aa3ad;margin-top:12px}
-    .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+    .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:12px}
     .btn{display:inline-block;padding:10px 14px;border-radius:10px;border:1px solid #2a323c;
       background:#12161b;color:#eef2f6;text-decoration:none}
+    .primary{background:#3ddc84;color:#0b0f12;border-color:#2aa96a;font-weight:700}
+    .card{margin:14px auto;padding:14px;border-radius:12px;background:#1a2027;border:1px solid #2a323c;max-width:640px}
+    .hidden{display:none}
   </style>
 
   <!-- Google Identity Services -->
@@ -32,24 +35,66 @@
   <main class="wrap">
     <h1>Google 로그인</h1>
 
-    <!-- ✅ 구글 버튼(필수) — 콜백은 프로덕션 절대경로 고정 -->
-    <div id="g_id_onload"
-         data-client_id="450986282498-qrps05rotaju8g808co7aank22mkag02.apps.googleusercontent.com"
-         data-login_uri="https://belthera-taro-saju-api.vercel.app/api/google-callback"
-         data-ux_mode="redirect"
-         data-context="signin"
-         data-auto_select="false"></div>
+    <!-- 인앱(WebView)용 안내/버튼 -->
+    <div id="iab" class="card hidden">
+      <p class="help">인앱(내장 브라우저)으로 감지되었습니다. 보안을 위해 Google 로그인이 차단됩니다.</p>
+      <div class="row" style="margin-top:8px">
+        <!-- Android 강제 이동(크롬/삼성 인터넷) -->
+        <a class="btn" id="openChrome">🔓 크롬으로 열기 (Android)</a>
+        <a class="btn" id="openSamsung">🔓 삼성 인터넷으로 열기 (Android)</a>
+        <a class="btn" id="copyLink">🔗 로그인 링크 복사</a>
+      </div>
+      <p class="help" style="margin-top:8px">iPhone(iOS): 우상단 <b>공유</b> → <b>Safari로 열기</b></p>
+      <div class="row" style="margin-top:8px"><a href="/" class="btn">← 메인으로</a></div>
+    </div>
 
-    <div class="g_id_signin"
-         data-type="standard" data-shape="rectangular" data-theme="outline"
-         data-text="signin_with" data-size="large" data-logo_alignment="left"
-         style="margin-top:18px"></div>
+    <!-- 일반 브라우저에서만 구글 버튼 노출 -->
+    <div id="gis" class="hidden">
+      <div id="g_id_onload"
+           data-client_id="450986282498-qrps05rotaju8g808co7aank22mkag02.apps.googleusercontent.com"
+           data-login_uri="https://belthera-taro-saju-api.vercel.app/api/google-callback"
+           data-ux_mode="redirect"
+           data-context="signin"
+           data-auto_select="false"></div>
 
-    <p class="help">브라우저(Safari/크롬)에서만 동작합니다.</p>
+      <div class="g_id_signin"
+           data-type="standard" data-shape="rectangular" data-theme="outline"
+           data-text="signin_with" data-size="large" data-logo_alignment="left"
+           style="margin-top:18px"></div>
 
-    <div class="row">
-      <a href="/" class="btn">← 메인으로</a>
+      <p class="help">브라우저(Safari/크롬)에서만 동작합니다.</p>
+      <div class="row"><a href="/" class="btn">← 메인으로</a></div>
     </div>
   </main>
+
+  <script>
+    // 강력한 인앱(WebView) 감지
+    function isInApp(){
+      const ua=(navigator.userAgent||'').toLowerCase();
+      // 카톡/인스타/페북/네이버/라인/다음 + 안드 로컬 WebView 토큰(; wv)
+      return /(kakaotalk|instagram|fbav|fban|fb_iab|line|naver|daumapp|; wv| version\/\d+\.\d+ chrome\/\d+\.\d+ mobile safari\/\d+)/i.test(ua);
+    }
+    // Android 인텐트 → 외부 브라우저 강제
+    function openWith(pkg){
+      const url='https://belthera-taro-saju-api.vercel.app/pages/login.html';
+      location.href='intent://'+url.replace(/^https?:\/\//,'')+'#Intent;scheme=https;package='+pkg+';end';
+    }
+    function copyLoginLink(){
+      const url='https://belthera-taro-saju-api.vercel.app/pages/login.html';
+      (navigator.clipboard?.writeText(url)||Promise.reject()).then(()=>alert('링크 복사됨')).catch(()=>alert('복사 실패'));
+    }
+
+    window.addEventListener('DOMContentLoaded',()=>{
+      const iab=isInApp();
+      document.getElementById('iab').classList.toggle('hidden',!iab);
+      document.getElementById('gis').classList.toggle('hidden',iab);
+
+      if(iab){
+        document.getElementById('openChrome').onclick = ()=>openWith('com.android.chrome');
+        document.getElementById('openSamsung').onclick= ()=>openWith('com.sec.android.app.sbrowser');
+        document.getElementById('copyLink').onclick   = copyLoginLink;
+      }
+    });
+  </script>
 </body>
 </html>
