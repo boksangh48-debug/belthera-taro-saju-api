@@ -3,75 +3,60 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="referrer" content="origin-when-cross-origin">
-  <title>Belthera · Login</title>
+  <title>Google 로그인</title>
   <style>
-    body{margin:0;background:#0f1216;color:#eef2f6;font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Helvetica,Arial}
-    .wrap{max-width:720px;margin:24px auto;padding:20px}
-    .help{color:#9aa3ad}
-    .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-    .btn{display:inline-block;padding:10px 14px;border-radius:10px;border:1px solid #2a323c;color:#eef2f6;text-decoration:none;background:#12161b}
+    body{margin:0;background:#0f1216;color:#eef2f6;
+      font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Helvetica,Arial}
+    .wrap{max-width:640px;margin:60px auto;padding:20px;text-align:center}
+    h1{margin-bottom:20px}
+    .help{color:#9aa3ad;margin-top:12px}
+    .btn{margin-top:24px;display:inline-block;padding:12px 20px;
+      border-radius:10px;background:#3ddc84;color:#0b0f12;font-weight:700;text-decoration:none}
   </style>
-  <script>
-    function isInApp(){
-      const ua=(navigator.userAgent||'').toLowerCase();
-      return /(kakaotalk|fbav|fban|instagram|naver|line|daumapp|fb_iab)/i.test(ua);
-    }
-    function copyLoginLink(){
-      const url = location.origin + '/pages/login.html';
-      navigator.clipboard?.writeText(url).then(()=>alert('링크 복사됨')).catch(()=>alert('복사 실패'));
-    }
-    // Android 인텐트 링크 (크롬/삼성 인터넷)
-    function androidChromeIntent(){
-      const u = location.origin + '/pages/login.html';
-      location.href = 'intent://' + u.replace(/^https?:\/\//,'') + '#Intent;scheme=https;package=com.android.chrome;end';
-    }
-    function androidSamsungIntent(){
-      const u = location.origin + '/pages/login.html';
-      location.href = 'intent://' + u.replace(/^https?:\/\//,'') + '#Intent;scheme=https;package=com.sec.android.app.sbrowser;end';
-    }
-    window.addEventListener('DOMContentLoaded',()=>{
-      const warn=document.getElementById('warn');
-      const gis=document.getElementById('gisbox');
-      const inapp=isInApp();
-      warn.style.display = inapp ? 'block' : 'none';
-      gis.style.display  = inapp ? 'none'  : 'block';
-    });
-  </script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
   <main class="wrap">
     <h1>Google 로그인</h1>
 
-    <!-- 인앱에서만 보이는 안내 + 외부 브라우저 버튼 -->
+    <!-- 인앱 브라우저 감지 -->
     <div id="warn" class="help" style="display:none">
-      인앱으로 감지되었습니다. <b>⋯ 메뉴 → 기본 브라우저로 열기</b>를 눌러 주세요.
-      <div class="row" style="margin-top:8px">
-        <a class="btn" href="javascript:androidChromeIntent()">🔓 크롬으로 열기 (Android)</a>
-        <a class="btn" href="javascript:androidSamsungIntent()">🔓 삼성 인터넷으로 열기 (Android)</a>
-        <a class="btn" href="javascript:copyLoginLink()">🔗 로그인 링크 복사</a>
-        <a class="btn" href="/">← 메인으로</a>
-      </div>
-      <p class="help" style="margin-top:8px">iOS: 우측 상단 <b>공유</b> → <b>Safari로 열기</b></p>
+      인앱으로 감지되었습니다.  
+      <b>⋯ → 기본 브라우저로 열기</b>를 눌러 주세요.
     </div>
 
-    <!-- 브라우저에서만 보이는 Google 버튼 -->
+    <!-- Google 로그인 버튼 -->
     <div id="gisbox" style="display:none">
       <div id="g_id_onload"
            data-client_id="450986282498-qrps05rotaju8g808co7aank22mkag02.apps.googleusercontent.com"
-           data-login_uri="/api/google-callback"
+           data-login_uri="https://belthera-taro-saju-api.vercel.app/api/google-callback"
            data-ux_mode="redirect"
            data-context="signin"
            data-auto_select="false"></div>
-
       <div class="g_id_signin"
-           data-type="standard" data-shape="rectangular" data-theme="outline"
-           data-text="signin_with" data-size="large" data-logo_alignment="left"></div>
-
+           data-type="standard"
+           data-shape="rectangular"
+           data-theme="outline"
+           data-text="signin_with"
+           data-size="large"
+           data-logo_alignment="left"></div>
       <p class="help">브라우저에서만 동작합니다.</p>
-      <p class="help"><a class="btn" href="/">← 메인으로</a></p>
     </div>
+
+    <a href="/" class="btn">← 메인으로</a>
   </main>
+
+  <script>
+    function isInApp(){
+      const ua=(navigator.userAgent||'').toLowerCase();
+      return /(kakaotalk|fbav|fban|instagram|naver|line|daumapp|fb_iab)/i.test(ua);
+    }
+    window.addEventListener('DOMContentLoaded',()=>{
+      const w=document.getElementById('warn');
+      const b=document.getElementById('gisbox');
+      if(isInApp()){w.style.display='block';b.style.display='none';}
+      else{w.style.display='none';b.style.display='block';}
+    });
+  </script>
 </body>
 </html>
