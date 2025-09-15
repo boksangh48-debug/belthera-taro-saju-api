@@ -1,27 +1,39 @@
-// /api/reading.js — SoulPattern GPT 리포트 (11섹션 고정, 보정 포함)
-// ✅ 기능:
-// 1) 소울넘버 서버 계산 (11/22 마스터 유지, 모든 숫자 합 반복 축약)
-// 2) 오늘(KST) + 사용자 입력 기반 SHA-256 해시 → "결정론적 6장 타로카드" (랜덤 금지, 역방향 없음)
-// 3) time='모름'이면 리듬 선택 강제
-// 4) 모델 응답 검증: 섹션 11개, 각 4~6문장. 틀리면 자동 1회 보정 재시도.
-
+// /api/reading.js — SoulPattern GPT (CUSTOM AWARE)
+// 기능 요약:
+// - /configs/custom.json을 읽어 커스텀(톤/길이/초점/덱)을 반영
+// - 소울넘버 서버 계산(11/22 유지), "오늘(KST)+입력" 시드로 6장 결정론 추출
+// - time='모름'이면 리듬 선택 강제
+// - 11섹션/각 4~6문장 보증 + 자동 1회 보정
 export const config = { runtime: 'edge' };
 
-/* ---------- Soul Number ---------- */
-function calcSoulNumber(dateStr = '') {
-  const digits = (dateStr.match(/\d/g) || []).map(x => +x);
-  if (!digits.length) return 0;
-  let sum = digits.reduce((a, b) => a + b, 0);
-
-  const collapseOnce = n => ('' + n).split('').map(Number).reduce((a, b) => a + b, 0);
-
-  while (sum >= 10 && sum !== 11 && sum !== 22) {
-    sum = collapseOnce(sum);
+/* ---- helpers: load custom ---- */
+async function loadCustom(origin) {
+  try {
+    const r = await fetch(`${origin}/configs/custom.json`, { cache: 'no-store' });
+    if (!r.ok) throw new Error('no custom');
+    return await r.json();
+  } catch {
+    // 안전한 디폴트
+    return {
+      brand: { voice: "따뜻하고 단정한 상담 톤, 직설적이되 공감 유지", avoid_jargon: true },
+      report: { section_count: 11, sentences_per_section_min: 4, sentences_per_section_max: 6, final_summary_focus_default: "감정" },
+      tarot: { deck_mode: "major_only", draw_mode: "deterministic_kst_seed", use_reversed: false },
+      saju: { require_time_rhythm_when_unknown: true, time_rhythm_options: ["오전형","낮형","저녁형"] },
+      followup: { limit_per_report: 5, sentences_min: 5, sentences_max: 7 }
+    };
   }
-  return sum;
 }
 
-function soulArcanaMap(n) {
+/* ---- Soul number ---- */
+function calcSoulNumber(dateStr='') {
+  const digits = (dateStr.match(/\d/g) || []).map(x=>+x);
+  if (!digits.length) return 0;
+  let sum = digits.reduce((a,b)=>a+b,0);
+  const collapseOnce = n => (''+n).split('').map(Number).reduce((a,b)=>a+b,0);
+  while (sum >= 10 && sum !== 11 && sum !== 22) sum = collapseOnce(sum);
+  return sum;
+}
+function soulArcanaMap(n){
   const map = {
     0:'0 바보', 1:'Ⅰ 마법사', 2:'Ⅱ 여사제', 3:'Ⅲ 여황제', 4:'Ⅳ 황제', 5:'Ⅴ 교황',
     6:'Ⅵ 연인', 7:'Ⅶ 전차', 8:'Ⅷ 힘', 9:'Ⅸ 은둔자', 10:'Ⅹ 운명의 바퀴',
@@ -32,49 +44,46 @@ function soulArcanaMap(n) {
   return map[n] ?? '';
 }
 
-/* ---------- Tarot Deck ---------- */
+/* ---- Tarot Deck ---- */
 const MAJOR = [
   '0 바보','Ⅰ 마법사','Ⅱ 여사제','Ⅲ 여황제','Ⅳ 황제','Ⅴ 교황',
   'Ⅵ 연인','Ⅶ 전차','Ⅷ 힘','Ⅸ 은둔자','Ⅹ 운명의 바퀴',
   'Ⅺ 정의','Ⅻ 매달린 사람','ⅩⅢ 죽음','ⅩⅣ 절제','ⅩⅤ 악마',
   'ⅩⅥ 탑','ⅩⅦ 별','ⅩⅧ 달','ⅩⅨ 태양','ⅩⅩ 심판','ⅩⅩⅠ 세계'
 ];
+// full_78 확장 필요 시 여기에 슈트 추가(현재는 major_only)
 
-// 오늘 KST (YYYY-MM-DD)
+/* ---- deterministic draw ---- */
 function todayKST() {
   const now = new Date();
-  const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
-  return kst.toISOString().slice(0, 10);
+  const kst = new Date(now.getTime() + 9*60*60*1000);
+  return kst.toISOString().slice(0,10);
 }
-
-// 결정론적 6장 선택 (SHA-256)
 async function pick6Deterministic(seed, deckSize) {
   const enc = new TextEncoder();
   const hash = await crypto.subtle.digest('SHA-256', enc.encode(seed));
   const bytes = Array.from(new Uint8Array(hash));
-
-  const picks = new Set();
-  let i = 0;
+  const picks = new Set(); let i=0;
   while (picks.size < 6) {
-    const chunk = (bytes[i % bytes.length] << 8) ^ (bytes[(i + 7) % bytes.length] << 4) ^ bytes[(i + 13) % bytes.length];
-    const idx = Math.abs(chunk) % deckSize;
-    picks.add(idx);
+    const chunk = (bytes[i % bytes.length] << 8) ^ (bytes[(i+7)%bytes.length] << 4) ^ bytes[(i+13)%bytes.length];
+    picks.add(Math.abs(chunk) % deckSize);
     i++;
   }
   return Array.from(picks);
 }
 
-/* ---------- Prompt ---------- */
-function buildSystemPrompt({ soul_number, soul_arcana, drawn6 }) {
+/* ---- prompts ---- */
+function buildSystemPrompt(custom, { soul_number, soul_arcana, drawn6 }) {
+  const R = custom.report;
   return `당신은 감정 기반 리듬 상담 시스템 ‘SoulPattern GPT’입니다.
 
 ⟪역할⟫
-사주 구조 분석 + 소울타로 감정 흐름 해석을 통합한 11섹션 리포트를 생성하세요.
+사주 구조 분석 + 소울타로 감정 흐름 해석을 통합한 감정 중심 리듬 리포트를 생성합니다.
 
 ⟪출력 규격⟫
 - 반드시 {"sections":[...]} JSON 객체로만 반환.
-- sections = 정확히 11개.
-- 각 요소 = {"title":"<제목>", "body":"<4~6문장>"}.
+- sections = 정확히 ${R.section_count}개.
+- 각 요소 = {"title":"<제목>", "body":"<${R.sentences_per_section_min}~${R.sentences_per_section_max}문장>"}.
 - 제목 순서 고정:
   1 평생총운, 2 대운흐름, 3 전성기, 4 주의시기, 5 조언,
   6 능력운, 7 재물운, 8 애정운, 9 건강운, 10 소울타로카드, 11 정리
@@ -85,26 +94,28 @@ function buildSystemPrompt({ soul_number, soul_arcana, drawn6 }) {
 ⟪현재 상황 카드(결정론적)⟫
 - ${drawn6.join(', ')}
 
+⟪브랜드 톤⟫
+- ${custom.brand.voice}
+- 전문용어 남발 금지: ${custom.brand.avoid_jargon ? '금지' : '허용'}
+
 ⟪지침⟫
 - 10번 섹션에 소울넘버/아르카나 + 위 6장 반드시 반영.
-- 문체: 따뜻하고 단정, 한국어, 과도한 전문용어 금지.
-- JSON 외 출력 금지.`;
+- JSON 외 텍스트 금지.`;
 }
-
-/* ---------- Validation & Repair ---------- */
-async function validateAndRepair(sections, apiKey, sys, usr) {
-  const okLen = Array.isArray(sections) && sections.length === 11;
-  const okBodies = okLen && sections.every(s => {
+async function validateAndRepair(custom, sections, apiKey, sys, usr) {
+  const min = custom.report.sentences_per_section_min;
+  const max = custom.report.sentences_per_section_max;
+  const okLen = Array.isArray(sections) && sections.length === custom.report.section_count;
+  const okBodies = okLen && sections.every(s=>{
     if(!s || typeof s.title!=='string' || typeof s.body!=='string') return false;
     const sent = s.body.split(/[.!?]\s+/).filter(x=>x.trim().length>0).length;
-    return sent >= 4 && sent <= 6;
+    return sent >= min && sent <= max;
   });
   if (okLen && okBodies) return sections;
 
-  // 재시도
   const repairUser = `
-JSON을 11섹션으로 다시 고쳐서 주세요.
-조건: sections=11, 각 body=4~6문장, 순서 고정.
+다음 JSON을 조건에 맞게 고쳐주세요.
+- sections=${custom.report.section_count}, 각 body=${min}~${max}문장, 제목 순서 고정.
 원본: ${JSON.stringify({sections: sections||[]})}`;
 
   const r2 = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -123,46 +134,48 @@ JSON을 11섹션으로 다시 고쳐서 주세요.
   });
   if(!r2.ok) return sections || [];
   const j2 = await r2.json();
-  let p2 = {};
-  try { p2 = JSON.parse(j2.choices?.[0]?.message?.content || '{}'); } catch {}
-  const sec2 = Array.isArray(p2.sections) ? p2.sections : [];
-  return sec2;
+  let p2={}; try { p2 = JSON.parse(j2.choices?.[0]?.message?.content || '{}'); } catch {}
+  return Array.isArray(p2.sections) ? p2.sections : [];
 }
 
-/* ---------- Handler ---------- */
+/* ---- handler ---- */
 export default async function handler(req) {
   try {
     if (req.method !== 'POST') return new Response('Use POST', { status: 405 });
+
+    const origin = new URL(req.url).origin;
+    const custom = await loadCustom(origin);
 
     const body = await req.json().catch(()=> ({}));
     const {
       name='고객', birth_date='', calendar_type='양력',
       time='모름', gender='미상', city='', question='',
-      time_rhythm_selected='', final_summary_focus='감정'
+      time_rhythm_selected='', final_summary_focus=custom.report.final_summary_focus_default
     } = body || {};
 
-    // 출생시간 모름 + 리듬 미선택 → 선택 요청
-    const unknownSet = new Set(['','모름','unknown','알 수 없음','알수없음']);
-    const timeUnknown = unknownSet.has((time||'').trim().toLowerCase());
-    if (timeUnknown && !time_rhythm_selected) {
+    // 리듬 강제
+    const unknown = new Set(['','모름','unknown','알 수 없음','알수없음']);
+    if (custom.saju.require_time_rhythm_when_unknown && unknown.has((time||'').trim().toLowerCase()) && !time_rhythm_selected) {
       return new Response(JSON.stringify({
         ok:false, need_time_rhythm:true,
-        options:['오전형 (23:00~06:59)','낮형 (07:00~14:59)','저녁형 (15:00~22:59)'],
+        options: custom.saju.time_rhythm_options.map(v=>{
+          const map = { '오전형':'23:00~06:59','낮형':'07:00~14:59','저녁형':'15:00~22:59' };
+          return `${v} (${map[v]||''})`;
+        }),
         message:'출생시간이 확인되지 않았습니다. 위 3가지 중 하나를 선택해 주세요.'
       }), { headers:{'Content-Type':'application/json'} });
     }
 
-    // 소울넘버 계산
+    // 소울넘버 / 아르카나
     const soul_number = calcSoulNumber(birth_date);
     const soul_arcana = soulArcanaMap(soul_number);
 
-    // 현 상황 타로 6장 결정
+    // 현재상황 6장 (deck_mode=major_only)
     const seed = `[KST:${todayKST()}]|${name}|${birth_date}|${(question||'').slice(0,120)}`;
     const picks = await pick6Deterministic(seed, MAJOR.length);
     const drawn6 = picks.map(i => MAJOR[i]);
 
-    // User Prompt
-    const rhythmLabel = timeUnknown ? `모름→${time_rhythm_selected}` : time;
+    const rhythmLabel = unknown.has((time||'').trim().toLowerCase()) ? `모름→${time_rhythm_selected}` : time;
     const userPrompt = `
 입력:
 - 이름: ${name}
@@ -172,25 +185,24 @@ export default async function handler(req) {
 - 도시: ${city}
 - 질문: ${question||'미입력'}
 - 소울넘버: ${soul_number} / ${soul_arcana}
-- 현재상황카드: ${drawn6.join(', ')}
+- 현재상황카드(6): ${drawn6.join(', ')}
+- 마무리 초점: ${final_summary_focus}
 
 요청:
-- 반드시 11섹션 JSON만 반환.
-- 각 body는 4~6문장.`;
+- 반드시 ${custom.report.section_count}개 섹션 JSON만 반환.
+- 각 섹션 body는 ${custom.report.sentences_per_section_min}~${custom.report.sentences_per_section_max}문장.`;
 
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) return new Response('Missing OPENAI_API_KEY', { status: 500 });
 
+    const sys = buildSystemPrompt(custom, { soul_number, soul_arcana, drawn6 });
     const r = await fetch('https://api.openai.com/v1/chat/completions', {
       method:'POST',
       headers:{ 'Authorization':`Bearer ${apiKey}`, 'Content-Type':'application/json' },
       body: JSON.stringify({
         model:'gpt-4o-mini',
         temperature:0.7,
-        messages:[
-          { role:'system', content: buildSystemPrompt({ soul_number, soul_arcana, drawn6 }) },
-          { role:'user', content: userPrompt }
-        ],
+        messages:[ { role:'system', content: sys }, { role:'user', content: userPrompt } ],
         response_format:{ type:'json_object' }
       })
     });
@@ -200,25 +212,23 @@ export default async function handler(req) {
       return new Response(`OpenAI error: ${t}`, { status: 500 });
     }
     const data = await r.json();
-
-    let parsed={};
-    try { parsed = JSON.parse(data.choices?.[0]?.message?.content||'{}'); } catch {}
+    let parsed={}; try { parsed = JSON.parse(data.choices?.[0]?.message?.content || '{}'); } catch {}
     let sections = Array.isArray(parsed.sections) ? parsed.sections : [];
 
     // 검증 + 자동 보정
-    sections = await validateAndRepair(sections, apiKey, buildSystemPrompt({ soul_number, soul_arcana, drawn6 }), userPrompt);
+    sections = await validateAndRepair(custom, sections, apiKey, sys, userPrompt);
 
     const headers = new Headers({
       'Content-Type':'application/json',
-      'Set-Cookie':'qleft=5; Path=/; Max-Age=86400; SameSite=Lax; Secure'
+      'Set-Cookie': `qleft=${custom.followup.limit_per_report}; Path=/; Max-Age=86400; SameSite=Lax; Secure`
     });
     return new Response(JSON.stringify({
       ok:true,
       sections,
-      meta:{ soul_number, soul_arcana, drawn6, qleft:5 }
+      meta:{ soul_number, soul_arcana, drawn6, qleft: custom.followup.limit_per_report }
     }), { headers });
 
-  } catch(e) {
+  } catch (e) {
     return new Response('reading error', { status: 500 });
   }
 }
