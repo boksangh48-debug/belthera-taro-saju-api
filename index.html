@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Belthera · 타로·사주</title>
   <meta name="referrer" content="origin-when-cross-origin">
+
+  <!-- ✅ 프리뷰/서브도메인에서 열리면 프로덕션으로 강제 이동 -->
+  <script>
+    (function(){
+      var PROD = 'https://belthera-taro-saju-api.vercel.app';
+      if (location.origin !== PROD) {
+        location.replace(PROD + '/index.html');
+      }
+    })();
+  </script>
+
   <style>
     :root{--bg:#0f1216;--panel:#12161b;--muted:#9aa3ad;--text:#eef2f6;--accent:#3ddc84;--card:#1a2027;--border:#2a323c}
     *{box-sizing:border-box}
@@ -21,59 +32,11 @@
     .ghost{background:transparent;border-style:dashed}
     .ftr{display:flex;justify-content:space-between;align-items:center;margin-top:18px;color:var(--muted);font-size:12px}
     .help{color:#9aa3ad}
+
     /* 인앱 안내 카드 */
     .iab{display:none;margin:0 0 12px;padding:12px;border-radius:12px;background:#1a2027;border:1px solid #2a323c}
     .iab .row{grid-template-columns:repeat(2,1fr)}
   </style>
-  <script>
-    // 쿼리/쿠키 유틸
-    function qs(n){return new URL(location.href).searchParams.get(n)}
-    function hasCookie(n){return document.cookie.split(';').some(c=>c.trim().startsWith(n+'='))}
-    function setCookie(n,v,max){document.cookie=`${n}=${v}; Path=/; Max-Age=${max}; SameSite=Lax; Secure`}
-    // 인앱 감지
-    function isInApp(){
-      const ua=(navigator.userAgent||'').toLowerCase();
-      return /(kakaotalk|fbav|fban|instagram|naver|line|daumapp|fb_iab)/i.test(ua);
-    }
-    // 링크 복사
-    function copyLoginLink(){
-      const url = location.origin + '/pages/login.html';
-      navigator.clipboard?.writeText(url).then(()=>alert('링크 복사됨')).catch(()=>alert('복사 실패'));
-    }
-    // Android 인텐트로 외부 브라우저 열기
-    function androidChromeIntent(){
-      const u = location.origin + '/pages/login.html';
-      location.href = 'intent://' + u.replace(/^https?:\/\//,'') + '#Intent;scheme=https;package=com.android.chrome;end';
-    }
-    function androidSamsungIntent(){
-      const u = location.origin + '/pages/login.html';
-      location.href = 'intent://' + u.replace(/^https?:\/\//,'') + '#Intent;scheme=https;package=com.sec.android.app.sbrowser;end';
-    }
-
-    window.addEventListener('DOMContentLoaded',()=>{
-      const signed = (qs('signed_in')==='1' || hasCookie('g_signed'));
-      const signedNotice = document.getElementById('signedNotice');
-      const cta = document.getElementById('cta');
-
-      // 로그인 성공 표시 + 주소 정리
-      if (signed){
-        setCookie('g_signed','1',600);
-        if (location.search.includes('signed_in=1')) {
-          const u=new URL(location.href); u.searchParams.delete('signed_in');
-          history.replaceState({},'',u.pathname+(u.search?('?'+u.searchParams.toString()):''));
-        }
-        signedNotice.style.display='block';
-        cta.textContent='타로·사주 시작하기';
-        setTimeout(()=>{ signedNotice.style.display='none'; }, 2500);
-      }
-
-      // 인앱 처리: CTA 숨기고, 인앱 안내 + 외부 브라우저 버튼 노출
-      const inapp = isInApp();
-      document.getElementById('iab').style.display = inapp ? 'block' : 'none';
-      document.getElementById('ctaWrap').style.display = inapp ? 'none'  : 'block';
-      document.getElementById('ctaRow').style.display = inapp ? 'none'  : 'grid';
-    });
-  </script>
 </head>
 <body>
   <main class="wrap">
@@ -86,28 +49,30 @@
 
     <!-- 인앱 전용 안내 + 외부 브라우저 버튼 -->
     <section id="iab" class="iab">
-      <p class="help" style="margin:0 0 8px">인앱으로 감지되었습니다. 아래 버튼을 눌러 <b>외부 브라우저</b>로 이동해주세요.</p>
+      <p class="help" style="margin:0 0 8px">인앱으로 감지되었습니다. 아래 버튼으로 <b>외부 브라우저</b>에서 열어주세요.</p>
       <div class="row">
-        <a class="btn2" href="javascript:androidChromeIntent()">🔓 크롬으로 열기 (Android)</a>
-        <a class="btn2" href="javascript:androidSamsungIntent()">🔓 삼성 인터넷으로 열기 (Android)</a>
+        <a class="btn2" id="openChrome">🔓 크롬으로 열기 (Android)</a>
+        <a class="btn2" id="openSamsung">🔓 삼성 인터넷으로 열기 (Android)</a>
       </div>
       <div class="row" style="margin-top:8px">
-        <a class="btn2 ghost" href="javascript:copyLoginLink()">🔗 로그인 링크 복사</a>
-        <a class="btn2 ghost" href="/pages/login.html" target="_blank" rel="noopener">새 탭으로 열기</a>
+        <a class="btn2 ghost" id="copyLoginLink">🔗 로그인 링크 복사</a>
+        <a class="btn2 ghost" href="https://belthera-taro-saju-api.vercel.app/pages/login.html" target="_blank" rel="noopener">새 탭으로 열기</a>
       </div>
       <p class="help" style="margin-top:8px">iOS: 우상단 <b>공유</b> → <b>Safari로 열기</b></p>
     </section>
 
     <!-- 일반 브라우저에서 보이는 CTA -->
     <section id="ctaWrap">
-      <!-- ※ 앱 화면이 준비되면 href를 /pages/app.html 로 바꾸세요 -->
-      <a id="cta" class="btn" href="/pages/login.html">🃏 타로·사주 열기 (사파리/크롬)</a>
+      <!-- ✅ 절대경로로 고정: 항상 프로덕션 로그인으로 -->
+      <a id="cta" class="btn" href="https://belthera-taro-saju-api.vercel.app/pages/login.html">
+        🃏 타로·사주 열기 (사파리/크롬)
+      </a>
     </section>
 
     <section id="ctaRow" class="row">
-      <a class="btn2 ghost" href="javascript:copyLoginLink()">링크 복사</a>
-      <a class="btn2" href="/pages/login.html" target="_blank" rel="noopener">새 탭으로 열기</a>
-      <a class="btn2" href="javascript:alert('iOS: ••• → Safari로 열기')">iOS 사용법</a>
+      <a class="btn2 ghost" id="copyLoginLink2">링크 복사</a>
+      <a class="btn2" href="https://belthera-taro-saju-api.vercel.app/pages/login.html" target="_blank" rel="noopener">새 탭으로 열기</a>
+      <a class="btn2" href="javascript:void 0" id="iosHelp">iOS 사용법</a>
     </section>
 
     <div class="row" style="margin-top:18px">
@@ -117,5 +82,55 @@
 
     <footer class="ftr"><span>Belthera · Tarot & Saju</span><span>Build: now</span></footer>
   </main>
+
+  <script>
+    // 쿼리/쿠키 유틸
+    function qs(n){return new URL(location.href).searchParams.get(n)}
+    function hasCookie(n){return document.cookie.split(';').some(c=>c.trim().startsWith(n+'='))}
+    function setCookie(n,v,max){document.cookie=`${n}=${v}; Path=/; Max-Age=${max}; SameSite=Lax; Secure`}
+
+    // 인앱 감지(강화)
+    function isInApp(){
+      const ua=(navigator.userAgent||'').toLowerCase();
+      return /(kakaotalk|instagram|fbav|fban|fb_iab|line|naver|daumapp|; wv| version\/\d+\.\d+ chrome\/\d+\.\d+ mobile safari\/\d+)/i.test(ua);
+    }
+
+    // Android 인텐트로 외부 브라우저 강제 이동
+    function openWith(pkg){
+      const url='https://belthera-taro-saju-api.vercel.app/pages/login.html';
+      location.href='intent://'+url.replace(/^https?:\/\//,'')+'#Intent;scheme=https;package='+pkg+';end';
+    }
+    function copyLoginLink(){
+      const url='https://belthera-taro-saju-api.vercel.app/pages/login.html';
+      (navigator.clipboard?.writeText(url)||Promise.reject()).then(()=>alert('링크 복사됨')).catch(()=>alert('복사 실패'));
+    }
+
+    // 초기 상태(로그인 배지, 인앱 안내)
+    (function(){
+      if(qs('signed_in')==='1' || hasCookie('g_signed')){
+        setCookie('g_signed','1',600);
+        const sn=document.getElementById('signedNotice');
+        sn.style.display='block';
+        setTimeout(()=>{ sn.style.display='none'; }, 2500);
+        // 주소에서 표식 제거
+        if(location.search.includes('signed_in=1')){
+          const u=new URL(location.href); u.searchParams.delete('signed_in');
+          history.replaceState({},'',u.pathname+(u.search?('?'+u.searchParams.toString()):''));
+        }
+      }
+
+      const iab=isInApp();
+      document.getElementById('iab').style.display = iab ? 'block' : 'none';
+      document.getElementById('ctaWrap').style.display = iab ? 'none'  : 'block';
+      document.getElementById('ctaRow').style.display  = iab ? 'none'  : 'grid';
+
+      // 버튼 바인딩
+      document.getElementById('copyLoginLink').onclick = copyLoginLink;
+      document.getElementById('copyLoginLink2').onclick= copyLoginLink;
+      document.getElementById('iosHelp').onclick      = ()=>alert('iOS: 우상단 ••• 공유 → Safari로 열기');
+      document.getElementById('openChrome').onclick   = ()=>openWith('com.android.chrome');
+      document.getElementById('openSamsung').onclick  = ()=>openWith('com.sec.android.app.sbrowser');
+    })();
+  </script>
 </body>
 </html>
