@@ -1,10 +1,9 @@
 // /api/fallback.ts
-// SoulPattern GPT — Fallback Report Generator
-// 목적: 외부 API 실패 시 자체적으로 GPT를 통해 리포트 생성
+// SoulPattern GPT — Fallback Report Generator (with fixed soul-number)
 
 import { NextApiRequest, NextApiResponse } from "next";
 
-export const config = { runtime: "edge" }; // Vercel Edge Functions에서도 작동 가능
+export const config = { runtime: "edge" };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
@@ -14,8 +13,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const { name = "고객", birth_date = "", gender = "미상", time = "모름", question = "" } = req.body;
 
-    // 리포트 요청용 GPT 프롬프트 구성
-    const today = new Date().toISOString().slice(0, 10);
+    // ✅ 소울넘버 고정 API 호출
+    const origin = new URL(req.headers.referer || req.url!).origin;
+    const soulRes = await fetch(`${origin}/api/soul-number`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ birth_date })
+    });
+    const soulData = await soulRes.json();
+    const soul_number = soulData.soul_number;
+    const arcana = soulData.arcana;
+
+    // 🕒 현재 날짜 (KST)
+    const today = new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+    // 🧠 GPT 프롬프트
     const prompt = `
 당신은 감정 기반 리듬 상담 시스템 ‘SoulPattern GPT’입니다.
 
@@ -29,11 +41,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 - 출생시간: ${time}
 - 오늘 날짜: ${today}
 - 질문: ${question || "없음"}
+- 소울넘버: ${soul_number} / ${arcana}
 
 [요구사항]
+- 소울넘버는 위에서 주어진 숫자를 그대로 사용 (절대 재계산 금지)
 - 11개 섹션 구성 (1. 평생총운 ~ 11. 요약 및 실행 제안)
 - 각 섹션 제목에 이모지 포함 + 4~6문장 리딩
-- 소울넘버 계산 후 대응하는 메이저 아르카나 포함
 - 오늘 날짜 + 이름 기반으로 6장의 타로를 결정론적으로 정방향으로 배열
 - 타로카드는 메이저 아르카나에서만 선택
 - 반드시 마크다운으로 출력
@@ -48,7 +61,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gpt-4o", // 또는 gpt-4o-mini
+        model: "gpt-4o", // 또는 "gpt-4o-mini"
         temperature: 0.7,
         messages: [
           { role: "system", content: "너는 SoulPattern GPT라는 감정 리듬 상담 AI다." },
