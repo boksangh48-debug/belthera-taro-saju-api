@@ -1,11 +1,17 @@
 // /api/soul-number.ts
+// Soul Number 계산기 (항상 동일한 값 반환)
+
 import type { NextApiRequest, NextApiResponse } from "next";
 
 function calcSoulNumber(dateStr = "") {
   const digits = (dateStr.match(/\d/g) || []).map(x => +x);
   if (!digits.length) return 0;
   let sum = digits.reduce((a, b) => a + b, 0);
-  const collapseOnce = n => ('' + n).split('').map(Number).reduce((a, b) => a + b, 0);
+  const collapseOnce = (n: number) =>
+    ("" + n)
+      .split("")
+      .map(Number)
+      .reduce((a, b) => a + b, 0);
   while (sum >= 10 && sum !== 11 && sum !== 22) sum = collapseOnce(sum);
   return sum;
 }
@@ -27,7 +33,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const { birth_date = "" } = req.body;
-  const normalized = birth_date.replace(/[^0-9]/g, "");
+  const normalized = birth_date.replace(/[^0-9]/g, ""); // 19910320처럼 만들기
+
   if (normalized.length < 6) {
     return res.status(400).json({ error: "유효한 생년월일 형식이 아닙니다." });
   }
